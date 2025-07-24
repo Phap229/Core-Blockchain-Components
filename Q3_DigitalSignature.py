@@ -27,6 +27,7 @@ message = input("Enter a message to sign: ")
 message_bytes = message.encode()
 
 #Sign the message using the private key and PSS padding
+# Help from GPT to implement
 signature = private_key.sign(
     message_bytes,
     padding.PSS(
@@ -40,6 +41,7 @@ print(f"\nOriginal Message: {message}")
 print(f"Signature (hex): {signature.hex()}")
 
 # Verify the signature using the public key
+# Help from GPT to implement
 try:
     public_key.verify(
         signature,
