@@ -2,34 +2,60 @@ import hashlib
 import random
 import string
 
-# Avalanche Effect
-input_str = input("Enter a string: ")
-hash_original = hashlib.sha256(input_str.encode()).hexdigest()
-print(f"Original Input: {input_str}")
-print(f"Original Hash: {hash_original}")
+def hash_string(s):
+    # Using SHA-256
+    return hashlib.sha256(s.encode('utf-8')).hexdigest()
 
-# Modify input slightly to show avalanche effect
-modified_str = input_str + "a"  
-hash_modified = hashlib.sha256(modified_str.encode()).hexdigest()
-print(f"Modified Input: {modified_str}")
-print(f"Modified Hash: {hash_modified}")
+def hamming_distance(s1, s2):
+    # Calculate Hamming distance between two hex strings
+    b1 = bin(int(s1, 16))[2:].zfill(256)
+    b2 = bin(int(s2, 16))[2:].zfill(256)
+    return sum(c1 != c2 for c1, c2 in zip(b1, b2))
 
-# Pre-image Resistance
-target_hash = hashlib.sha256("hello".encode()).hexdigest()
-print(f"\nTarget Hash to Find Pre-image For: {target_hash}")
-attempts = 0
-max_attempts = 1000000
-found = False
+def minimal_change(s):
+    # Change the first character (if possible), else append 'a'
+    if not s:
+        return 'a'
+    c = s[0]
+    # Change to a different character
+    new_c = chr((ord(c) + 1) % 128)
+    return new_c + s[1:]
 
-# Try to find a string whose SHA-256 hash matches the target hash
-for _ in range(max_attempts):
-    random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # Generate random string
-    current_hash = hashlib.sha256(random_str.encode()).hexdigest()
-    attempts += 1
-    if current_hash == target_hash:
-        found = True
-        print(f"Pre-image found: {random_str}")
-        break
+def demonstrate_avalanche():
+    user_input = input("Enter a string: ")
+    original_hash = hash_string(user_input)
+    modified_input = minimal_change(user_input)
+    modified_hash = hash_string(modified_input)
+    print(f"\nOriginal input: {user_input}")
+    print(f"Original hash: {original_hash}")
+    print(f"\nModified input: {modified_input}")
+    print(f"Modified hash: {modified_hash}")
+    dist = hamming_distance(original_hash, modified_hash)
+    print(f"\nHamming distance between hashes: {dist} bits out of 256")
 
-if not found:
-    print(f"No pre-image found after {attempts} attempts.")
+def preimage_attack_demo():
+    print("\n--- Pre-image Resistance Demonstration ---")
+    target_string = "blockchain"
+    target_hash = hash_string(target_string)
+    print(f"Target string: {target_string}")
+    print(f"Target hash: {target_hash}")
+    attempts = 0
+    found = False
+    max_attempts = 100000  # Limit for demonstration
+    for _ in range(max_attempts):
+        # Generate a random 8-character string
+        candidate = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        candidate_hash = hash_string(candidate)
+        attempts += 1
+        if candidate_hash == target_hash:
+            found = True
+            print(f"Pre-image found! String: {candidate}")
+            break
+    if not found:
+        print(f"No pre-image found in {attempts} attempts.")
+    else:
+        print(f"Pre-image found in {attempts} attempts.")
+
+if __name__ == "__main__":
+    demonstrate_avalanche()
+    preimage_attack_demo()
