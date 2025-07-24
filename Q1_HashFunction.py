@@ -8,6 +8,7 @@ def hash_string(s):
 
 def hamming_distance(s1, s2):
     # Calculate Hamming distance between two hex strings
+    # Use Chat GPT for helping implement hamming
     b1 = bin(int(s1, 16))[2:].zfill(256)
     b2 = bin(int(s2, 16))[2:].zfill(256)
     return sum(c1 != c2 for c1, c2 in zip(b1, b2))
